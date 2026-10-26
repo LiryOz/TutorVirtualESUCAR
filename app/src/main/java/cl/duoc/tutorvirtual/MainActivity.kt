@@ -2,8 +2,8 @@ package cl.duoc.tutorvirtual
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -11,15 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cl.duoc.tutorvirtual.ui.screens.GuiaMetodologicaScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            MaterialTheme {
-                TutorVirtualApp()
-            }
-        }
+        setContent { MaterialTheme { TutorVirtualApp() } }
     }
 }
 
@@ -35,11 +32,9 @@ fun TutorVirtualApp() {
         topBar = {
             Surface(tonalElevation = 3.dp) {
                 Text(
-                    text = "Tutor Virtual ESUCAR",
+                    "Tutor Virtual ESUCAR",
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
+                    modifier = Modifier.fillMaxWidth().padding(20.dp)
                 )
             }
         }
@@ -52,37 +47,31 @@ fun TutorVirtualApp() {
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (pantalla == "Inicio") {
-                Text(
-                    "Bienvenido al Tutor Virtual",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Text("Apoyo para Trabajo de Título I, II y III.")
-
-                listOf(
-                    "Guía metodológica",
-                    "Preguntas frecuentes",
-                    "Mis avances",
-                    "Mi perfil"
-                ).forEach { destino ->
-                    Button(
-                        onClick = { pantalla = destino },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(destino)
+            when (pantalla) {
+                "Inicio" -> {
+                    Text("Bienvenido al Tutor Virtual",
+                        style = MaterialTheme.typography.headlineSmall)
+                    Text("Apoyo para Trabajo de Título I, II y III.")
+                    listOf("Guía metodológica", "Preguntas frecuentes",
+                        "Mis avances", "Mi perfil").forEach { destino ->
+                        Button(
+                            onClick = { pantalla = destino },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(destino) }
                     }
                 }
-            } else {
-                Text(
-                    pantalla,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                Text("Módulo preparado para próximas actividades.")
-
-                OutlinedButton(
-                    onClick = { pantalla = "Inicio" }
-                ) {
-                    Text("Volver al inicio")
+                "Guía metodológica" -> {
+                    GuiaMetodologicaScreen()
+                    OutlinedButton(onClick = { pantalla = "Inicio" }) {
+                        Text("Volver al inicio")
+                    }
+                }
+                else -> {
+                    Text(pantalla, style = MaterialTheme.typography.headlineMedium)
+                    Text("Módulo preparado para próximas actividades.")
+                    OutlinedButton(onClick = { pantalla = "Inicio" }) {
+                        Text("Volver al inicio")
+                    }
                 }
             }
         }
