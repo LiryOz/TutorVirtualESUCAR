@@ -45,5 +45,4 @@ fun InicioScreen(irA: (String) -> Unit, abrirHito: (Long) -> Unit) {
 }
 
 
-@Composable fun HitoFormScreen(hitoId: Long?, alTerminar: () -> Unit) = EnConstruccion("Formulario de hito")
 @Composable fun PerfilScreen() = EnConstruccion("Mi perfil")
