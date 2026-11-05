@@ -11,6 +11,7 @@ import cl.duoc.tutorvirtual.data.model.Asignatura
 import cl.duoc.tutorvirtual.data.model.Perfil
 import cl.duoc.tutorvirtual.data.model.Rol
 import cl.duoc.tutorvirtual.data.repository.PreferenciasRepository
+import cl.duoc.tutorvirtual.nativo.GestorFotos
 import cl.duoc.tutorvirtual.validation.PerfilErrores
 import cl.duoc.tutorvirtual.validation.PerfilValidator
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -124,8 +125,13 @@ class PerfilViewModel(private val preferencias: PreferenciasRepository) : ViewMo
         viewModelScope.launch { preferencias.cambiarTextoGrande(activo) }
     }
 
+    /** Guarda la nueva foto de perfil y borra el archivo de la anterior. */
     fun guardarFoto(ruta: String?) {
-        viewModelScope.launch { preferencias.guardarFoto(ruta) }
+        viewModelScope.launch {
+            val anterior = preferencias.perfil.first().foto
+            preferencias.guardarFoto(ruta)
+            if (anterior != null && anterior != ruta) GestorFotos.eliminar(anterior)
+        }
     }
 
     fun mensajeMostrado() = _estado.update { it.copy(mensaje = null) }

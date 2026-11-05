@@ -48,6 +48,7 @@ import cl.duoc.tutorvirtual.data.model.Asignatura
 import cl.duoc.tutorvirtual.data.model.Rol
 import cl.duoc.tutorvirtual.ui.components.CampoValidado
 import cl.duoc.tutorvirtual.ui.components.MensajeError
+import cl.duoc.tutorvirtual.ui.components.SelectorFoto
 import cl.duoc.tutorvirtual.viewmodel.PerfilViewModel
 
 /** Perfil del usuario (formulario validado) + ajustes de la app. */
@@ -55,6 +56,7 @@ import cl.duoc.tutorvirtual.viewmodel.PerfilViewModel
 fun PerfilScreen(viewModel: PerfilViewModel = viewModel(factory = PerfilViewModel.Factory)) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
     val ajustes by viewModel.ajustes.collectAsStateWithLifecycle()
+    val foto by viewModel.foto.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
 
     LaunchedEffect(estado.mensaje) {
@@ -71,6 +73,17 @@ fun PerfilScreen(viewModel: PerfilViewModel = viewModel(factory = PerfilViewMode
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Column(Modifier.widthIn(max = 700.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+
+                // ---------- Foto de perfil (cámara / galería) ----------
+                Card(Modifier.fillMaxWidth()) {
+                    SelectorFoto(
+                        ruta = foto,
+                        alCambiar = viewModel::guardarFoto,
+                        titulo = "Foto de perfil",
+                        circular = true,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
 
                 // ---------- Datos personales ----------
                 Card(Modifier.fillMaxWidth()) {

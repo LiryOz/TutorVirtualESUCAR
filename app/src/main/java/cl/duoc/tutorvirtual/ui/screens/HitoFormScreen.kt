@@ -52,6 +52,7 @@ import cl.duoc.tutorvirtual.R
 import cl.duoc.tutorvirtual.data.model.EstadoHito
 import cl.duoc.tutorvirtual.ui.components.CampoValidado
 import cl.duoc.tutorvirtual.ui.components.MensajeError
+import cl.duoc.tutorvirtual.ui.components.SelectorFoto
 import cl.duoc.tutorvirtual.validation.HitoValidator
 import cl.duoc.tutorvirtual.viewmodel.HitoFormViewModel
 import java.time.Instant
@@ -147,6 +148,14 @@ fun HitoFormScreen(
                     seleccionado = estado.estado,
                     error = estado.errores.estado,
                     alElegir = viewModel::onEstadoChange
+                )
+
+                HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                // Evidencia del avance: foto con cámara o desde galería (recursos nativos)
+                SelectorFoto(
+                    ruta = estado.fotoEvidencia,
+                    alCambiar = viewModel::onFotoChange,
+                    titulo = "Foto de evidencia (opcional)"
                 )
 
                 Spacer8()
