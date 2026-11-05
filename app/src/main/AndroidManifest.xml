@@ -4,6 +4,8 @@
 
     <!-- Recurso nativo: cámara (permiso "peligroso", se pide también en tiempo de ejecución) -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Notificaciones locales de fechas límite (Android 13+ lo pide en tiempo de ejecución) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- La app también funciona en equipos sin cámara (se puede usar la galería) -->
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
 

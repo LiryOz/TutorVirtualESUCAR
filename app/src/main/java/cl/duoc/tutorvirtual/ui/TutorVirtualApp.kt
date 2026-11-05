@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cl.duoc.tutorvirtual.R
+import cl.duoc.tutorvirtual.ui.components.RevisarRecordatoriosAlIniciar
 import cl.duoc.tutorvirtual.ui.navigation.AppNavHost
 import cl.duoc.tutorvirtual.ui.navigation.DestinoPrincipal
 import cl.duoc.tutorvirtual.ui.navigation.Rutas
@@ -45,6 +46,9 @@ fun TutorVirtualApp(anchoVentana: WindowWidthSizeClass) {
     // ¿La pantalla actual es una de las 5 principales? Si no, mostramos "volver".
     val esPrincipal = DestinoPrincipal.entries.any { it.ruta == rutaActual }
     val usarRail = anchoVentana != WindowWidthSizeClass.Compact
+
+    // Al abrir la app: aviso de hitos próximos a vencer (notificación local)
+    RevisarRecordatoriosAlIniciar()
 
     // Qué ítem de la barra se marca: las sub-pantallas marcan a su "padre"
     fun estaSeleccionado(destino: DestinoPrincipal) = when (rutaActual) {

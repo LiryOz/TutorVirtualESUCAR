@@ -1,5 +1,11 @@
 package cl.duoc.tutorvirtual.ui.screens
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import cl.duoc.tutorvirtual.nativo.Notificador
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +63,20 @@ fun PerfilScreen(viewModel: PerfilViewModel = viewModel(factory = PerfilViewMode
     val estado by viewModel.estado.collectAsStateWithLifecycle()
     val ajustes by viewModel.ajustes.collectAsStateWithLifecycle()
     val foto by viewModel.foto.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    // Al activar recordatorios en Android 13+ se pide el permiso de notificaciones
+    val pedirPermisoNotif = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { concedido ->
+        viewModel.cambiarRecordatorios(concedido)
+        if (!concedido) viewModel.avisar("Sin permiso de notificaciones no podemos recordarte los plazos")
+    }
+    fun alCambiarRecordatorios(activo: Boolean) {
+        if (activo && !Notificador.tienePermiso(context) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pedirPermisoNotif.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            viewModel.cambiarRecordatorios(activo)
+        }
+    }
     val snackbar = remember { SnackbarHostState() }
 
     LaunchedEffect(estado.mensaje) {
@@ -158,7 +178,7 @@ fun PerfilScreen(viewModel: PerfilViewModel = viewModel(factory = PerfilViewMode
                             titulo = "Recordatorios de fechas límite",
                             detalle = "Aviso cuando un hito vence en 3 días o menos",
                             activo = ajustes.recordatorios,
-                            alCambiar = viewModel::cambiarRecordatorios
+                            alCambiar = ::alCambiarRecordatorios
                         )
                         HorizontalDivider()
                         FilaSwitch(

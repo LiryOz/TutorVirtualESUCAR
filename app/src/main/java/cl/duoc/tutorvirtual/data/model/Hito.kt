@@ -38,3 +38,11 @@ data class Hito(
     fun estaPorVencer(hoy: LocalDate, dias: Long = 3): Boolean =
         !estado.estaTerminado && diasRestantes(hoy) in 0..dias
 }
+
+/**
+ * Regla de negocio de las alertas: se avisa de los hitos vencidos o que vencen
+ * en 3 días o menos, ordenados por fecha. La usan la pantalla de inicio y las notificaciones.
+ */
+fun hitosQueRequierenAviso(hitos: List<Hito>, hoy: LocalDate): List<Hito> =
+    hitos.filter { it.estaVencido(hoy) || it.estaPorVencer(hoy) }
+        .sortedBy { it.fechaLimite }

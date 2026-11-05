@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import cl.duoc.tutorvirtual.TutorApp
 import cl.duoc.tutorvirtual.data.model.Hito
 import cl.duoc.tutorvirtual.data.model.Perfil
+import cl.duoc.tutorvirtual.data.model.hitosQueRequierenAviso
 import cl.duoc.tutorvirtual.data.repository.HitoRepository
 import cl.duoc.tutorvirtual.data.repository.PreferenciasRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,7 +25,7 @@ data class InicioUiState(
 ) {
     /** Hitos que necesitan atención: vencidos o por vencer en 3 días. */
     val alertas: List<Hito>
-        get() = resumen.hitos.filter { it.estaVencido(hoy) || it.estaPorVencer(hoy) }
+        get() = hitosQueRequierenAviso(resumen.hitos, hoy)
 }
 
 /** Junta (combine) el perfil de DataStore y los hitos de Room para el panel de inicio. */

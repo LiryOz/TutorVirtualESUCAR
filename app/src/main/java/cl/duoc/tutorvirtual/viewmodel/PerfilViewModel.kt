@@ -136,6 +136,8 @@ class PerfilViewModel(private val preferencias: PreferenciasRepository) : ViewMo
 
     fun mensajeMostrado() = _estado.update { it.copy(mensaje = null) }
 
+    fun avisar(texto: String) = _estado.update { it.copy(mensaje = texto) }
+
     companion object {
         val Factory = viewModelFactory {
             initializer {
