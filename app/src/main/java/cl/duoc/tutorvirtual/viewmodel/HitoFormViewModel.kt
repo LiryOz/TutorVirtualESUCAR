@@ -166,7 +166,11 @@ class HitoFormViewModel(
         fun factory(hitoId: Long?) = viewModelFactory {
             initializer {
                 val app = this[APPLICATION_KEY] as TutorApp
-                HitoFormViewModel(app.contenedor.hitoRepository, hitoId)
+                HitoFormViewModel(
+                    repositorio = app.contenedor.hitoRepository,
+                    hitoId = hitoId,
+                    esProfesor = app.contenedor.preferencias.esProfesor
+                )
             }
         }
     }
