@@ -39,7 +39,15 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
             Rutas.GUIA_DETALLE,
             arguments = listOf(navArgument("etapaId") { type = NavType.IntType })
         ) { entrada ->
-            GuiaDetalleScreen(etapaId = entrada.arguments?.getInt("etapaId") ?: 1)
+            GuiaDetalleScreen(
+                etapaId = entrada.arguments?.getInt("etapaId") ?: 1,
+                // Al pasar a otra etapa reemplazamos la actual, así "volver" lleva a la lista
+                irAEtapa = { id ->
+                    navController.navigate(Rutas.guiaDetalle(id)) {
+                        popUpTo(Rutas.GUIA)
+                    }
+                }
+            )
         }
         composable(Rutas.FAQ) { FaqScreen() }
         composable(Rutas.HITOS) {

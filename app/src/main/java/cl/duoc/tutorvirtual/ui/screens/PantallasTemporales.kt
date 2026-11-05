@@ -44,14 +44,7 @@ fun InicioScreen(irA: (String) -> Unit, abrirHito: (Long) -> Unit) {
     }
 }
 
-@Composable
-fun GuiaScreen(abrirEtapa: (Int) -> Unit) {
-    Column(Modifier.verticalScroll(rememberScrollState()).padding(20.dp)) {
-        GuiaMetodologicaScreen()
-    }
-}
 
-@Composable fun GuiaDetalleScreen(etapaId: Int) = EnConstruccion("Etapa $etapaId")
 @Composable fun FaqScreen() = EnConstruccion("Preguntas frecuentes")
 @Composable fun HitosScreen(nuevoHito: () -> Unit, editarHito: (Long) -> Unit) = EnConstruccion("Mis hitos")
 @Composable fun HitoFormScreen(hitoId: Long?, alTerminar: () -> Unit) = EnConstruccion("Formulario de hito")
