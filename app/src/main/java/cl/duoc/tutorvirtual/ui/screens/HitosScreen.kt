@@ -1,5 +1,7 @@
 package cl.duoc.tutorvirtual.ui.screens
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.material3.CardDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -164,7 +166,18 @@ private fun TarjetaHito(
     val vencido = hito.estaVencido(hoy)
     val porVencer = hito.estaPorVencer(hoy)
 
-    Card(onClick = alEditar, modifier = modifier.fillMaxWidth()) {
+    // animateDpAsState (2.4.1): los hitos urgentes se "elevan" para llamar la atención;
+    // al marcarlos como entregados bajan suavemente.
+    val elevacion by animateDpAsState(
+        targetValue = if (vencido || porVencer) 6.dp else 1.dp,
+        label = "elevacionHito"
+    )
+
+    Card(
+        onClick = alEditar,
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = elevacion)
+    ) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             // Checklist de entrega
             Checkbox(

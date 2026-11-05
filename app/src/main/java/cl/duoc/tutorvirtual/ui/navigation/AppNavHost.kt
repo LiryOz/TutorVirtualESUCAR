@@ -1,5 +1,10 @@
 package cl.duoc.tutorvirtual.ui.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -24,7 +29,12 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
     NavHost(
         navController = navController,
         startDestination = Rutas.INICIO,
-        modifier = modifier
+        modifier = modifier,
+        // Transiciones entre pantallas (2.4.1): la nueva entra deslizándose y aparece suavemente
+        enterTransition = { fadeIn(tween(300)) + slideInHorizontally(tween(300)) { it / 8 } },
+        exitTransition = { fadeOut(tween(200)) },
+        popEnterTransition = { fadeIn(tween(300)) + slideInHorizontally(tween(300)) { -it / 8 } },
+        popExitTransition = { fadeOut(tween(200)) + slideOutHorizontally(tween(300)) { it / 8 } }
     ) {
         composable(Rutas.INICIO) {
             InicioScreen(
