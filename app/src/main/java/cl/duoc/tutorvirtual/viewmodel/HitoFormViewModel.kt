@@ -109,14 +109,16 @@ class HitoFormViewModel(
         viewModelScope.launch {
             val profesor = esProfesor.first()
             _estado.update {
+                val errorEstado = HitoValidator.validarEstado(nuevo, profesor, original?.estado)
+                // Si ya hay fecha elegida, se vuelve a revisar con el nuevo estado
+                val errorFecha = if (it.fechaLimite != null) {
+                    HitoValidator.validarFecha(it.fechaLimite, nuevo, hoy(), original?.fechaLimite)
+                } else {
+                    it.errores.fecha
+                }
                 it.copy(
                     estado = nuevo,
-                    errores = it.errores.copy(
-                        estado = HitoValidator.validarEstado(nuevo, profesor, original?.estado),
-                        fecha = it.fechaLimite?.let { f ->
-                            HitoValidator.validarFecha(f, nuevo, hoy(), original?.fechaLimite)
-                        } ?: it.errores.fecha
-                    )
+                    errores = it.errores.copy(estado = errorEstado, fecha = errorFecha)
                 )
             }
         }

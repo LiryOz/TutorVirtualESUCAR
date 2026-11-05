@@ -23,10 +23,9 @@ android {
 
     buildTypes {
         release {
-            optimization {
-                enable = true
-                packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
-            }
+            // Sin ofuscar/reducir el código: más simple para un prototipo (MVP).
+            // (El bloque "optimization { packageScope }" de la plantilla requiere AGP 9.4+)
+            isMinifyEnabled = false
         }
     }
     compileOptions {

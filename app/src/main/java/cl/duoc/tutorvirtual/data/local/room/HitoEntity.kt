@@ -29,7 +29,8 @@ fun HitoEntity.aModelo() = Hito(
     descripcion = descripcion,
     formatoRequerido = formatoRequerido,
     fechaLimite = LocalDate.ofEpochDay(fechaLimiteEpochDay),
-    estado = runCatching { EstadoHito.valueOf(estado) }.getOrDefault(EstadoHito.POR_INICIAR),
+    // Busca el estado cuyo nombre coincide con el texto guardado; si no hay, "Por iniciar"
+    estado = EstadoHito.entries.find { it.name == estado } ?: EstadoHito.POR_INICIAR,
     fotoEvidencia = fotoEvidencia
 )
 

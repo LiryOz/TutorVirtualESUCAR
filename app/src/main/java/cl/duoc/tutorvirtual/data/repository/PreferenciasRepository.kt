@@ -21,9 +21,10 @@ class PreferenciasRepository(private val dataStore: DataStore<Preferences>) {
             nombre = p[Claves.NOMBRE] ?: "",
             rut = p[Claves.RUT] ?: "",
             correo = p[Claves.CORREO] ?: "",
-            asignatura = p[Claves.ASIGNATURA]?.let { runCatching { Asignatura.valueOf(it) }.getOrNull() },
+            // Se guardó el NOMBRE del enum (ej: "TT1"); aquí lo convertimos de vuelta
+            asignatura = Asignatura.entries.find { it.name == p[Claves.ASIGNATURA] },
             profesorGuia = p[Claves.PROFESOR_GUIA] ?: "",
-            rol = p[Claves.ROL]?.let { runCatching { Rol.valueOf(it) }.getOrNull() } ?: Rol.ESTUDIANTE,
+            rol = Rol.entries.find { it.name == p[Claves.ROL] } ?: Rol.ESTUDIANTE,
             foto = p[Claves.FOTO]
         )
     }
