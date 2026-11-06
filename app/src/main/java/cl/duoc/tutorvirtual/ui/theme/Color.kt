@@ -5,14 +5,18 @@ import androidx.compose.ui.graphics.Color
 // Paleta institucional (supuesto: verde y blanco). Todos los pares texto/fondo
 // tienen contraste alto, como pide el caso en "Accesibilidad".
 
+// Verdes institucionales
+val VerdeInstitucional = Color(0xFF1D7D5F)   // barras de navegación y color principal
+val VerdeSecundario = Color(0xFF1D5139)
+val VerdeAcento = Color(0xFF8AAA45)          // marca la pestaña seleccionada
+
 // Modo normal
-val VerdeInstitucional = Color(0xFF1B5E20)
 val VerdeClaro = Color(0xFFC8E6C9)
 val VerdeOscuro = Color(0xFF0A2E0C)
 val Dorado = Color(0xFF7A5900)
 val DoradoClaro = Color(0xFFFFE08A)
 val FondoClaro = Color(0xFFFAFAF7)
-val TextoOscuro = Color(0xFF141414)
+val TextoOscuro = Color(0xFF505050)          // color de todas las letras "negras"
 val GrisBorde = Color(0xFF5A5A5A)
 val RojoError = Color(0xFFB3261E)
 
@@ -27,4 +31,4 @@ val RojoErrorClaro = Color(0xFFFFB4AB)
 val EstadoPorIniciar = Color(0xFF616161)
 val EstadoEnDesarrollo = Color(0xFF8A5A00)
 val EstadoEnviado = Color(0xFF0D47A1)
-val EstadoAprobado = Color(0xFF1B5E20)
+val EstadoAprobado = VerdeSecundario
