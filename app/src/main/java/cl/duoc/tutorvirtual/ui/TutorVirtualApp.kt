@@ -3,6 +3,7 @@ package cl.duoc.tutorvirtual.ui
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -14,11 +15,15 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cl.duoc.tutorvirtual.ui.theme.VerdeAcento
@@ -43,8 +48,9 @@ import cl.duoc.tutorvirtual.ui.navigation.tituloDeRuta
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TutorVirtualApp(anchoVentana: WindowWidthSizeClass) {
+fun TutorVirtualApp(anchoVentana: WindowWidthSizeClass, cerrarSesion: () -> Unit) {
     val navController = rememberNavController()
+    var confirmarCierre by rememberSaveable { mutableStateOf(false) }
     val entradaActual by navController.currentBackStackEntryAsState()
     val rutaActual = entradaActual?.destination?.route
 
@@ -58,7 +64,7 @@ fun TutorVirtualApp(anchoVentana: WindowWidthSizeClass) {
     // Qué ítem de la barra se marca: las sub-pantallas marcan a su "padre"
     fun estaSeleccionado(destino: DestinoPrincipal) = when (rutaActual) {
         Rutas.GUIA_DETALLE -> destino == DestinoPrincipal.GUIA
-        Rutas.HITO_FORM -> destino == DestinoPrincipal.HITOS
+        Rutas.HITO_FORM, Rutas.HITO_DETALLE -> destino == DestinoPrincipal.HITOS
         else -> destino.ruta == rutaActual
     }
 
@@ -104,11 +110,17 @@ fun TutorVirtualApp(anchoVentana: WindowWidthSizeClass) {
                             }
                         }
                     },
+                    actions = {
+                        IconButton(onClick = { confirmarCierre = true }) {
+                            Icon(painterResource(R.drawable.ic_salir), contentDescription = "Cerrar sesión")
+                        }
+                    },
                     // Barra superior verde con el título y la flecha "volver" en blanco
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = VerdeInstitucional,
                         titleContentColor = Color.White,
-                        navigationIconContentColor = Color.White
+                        navigationIconContentColor = Color.White,
+                        actionIconContentColor = Color.White
                     )
                 )
             },
@@ -128,7 +140,23 @@ fun TutorVirtualApp(anchoVentana: WindowWidthSizeClass) {
                 }
             }
         ) { padding ->
-            AppNavHost(navController, Modifier.padding(padding))
+            AppNavHost(navController, pedirCierreSesion = { confirmarCierre = true }, Modifier.padding(padding))
         }
+    }
+
+    // Confirmación antes de cerrar la sesión
+    if (confirmarCierre) {
+        AlertDialog(
+            onDismissRequest = { confirmarCierre = false },
+            icon = { Icon(painterResource(R.drawable.ic_salir), contentDescription = null) },
+            title = { Text("¿Cerrar sesión?") },
+            text = { Text("Tus hitos y tu perfil quedan guardados en este dispositivo.") },
+            confirmButton = {
+                TextButton(onClick = { confirmarCierre = false; cerrarSesion() }) { Text("Cerrar sesión") }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmarCierre = false }) { Text("Cancelar") }
+            }
+        )
     }
 }

@@ -1,6 +1,19 @@
 package cl.duoc.tutorvirtual.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
+import androidx.compose.ui.draw.scale
+import cl.duoc.tutorvirtual.data.model.ResumenConversacion
 import androidx.compose.material3.CardDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -64,11 +77,16 @@ fun textoPlazo(hito: Hito, hoy: LocalDate): String {
     }
 }
 
-/** Lista de hitos guardados en Room, con checklist y progreso. */
+/**
+ * Lista de hitos guardados en Room, con progreso.
+ *  - Profesor guía: crea (botón "Nuevo hito") y elimina hitos.
+ *  - Estudiante: marca sus entregas con el checklist.
+ * Al tocar un hito se abre su detalle (estado + conversación).
+ */
 @Composable
 fun HitosScreen(
     nuevoHito: () -> Unit,
-    editarHito: (Long) -> Unit,
+    abrirHito: (Long) -> Unit,
     viewModel: HitosViewModel = viewModel(factory = HitosViewModel.Factory)
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
@@ -80,11 +98,14 @@ fun HitosScreen(
         contentWindowInsets = WindowInsets(0),   // el Scaffold principal ya aplica los márgenes
         snackbarHost = { SnackbarHost(snackbar) },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = nuevoHito,
-                icon = { Icon(painterResource(R.drawable.ic_agregar), contentDescription = null) },
-                text = { Text("Nuevo hito") }
-            )
+            // Solo el profesor guía define la estructura (crea hitos)
+            AnimatedVisibility(visible = estado.esProfesor && !estado.cargando, enter = scaleIn() + fadeIn()) {
+                ExtendedFloatingActionButton(
+                    onClick = nuevoHito,
+                    icon = { Icon(painterResource(R.drawable.ic_agregar), contentDescription = null) },
+                    text = { Text("Nuevo hito") }
+                )
+            }
         }
     ) { padding ->
         if (estado.cargando) {
@@ -112,7 +133,8 @@ fun HitosScreen(
             if (estado.hitos.isEmpty()) {
                 item {
                     Text(
-                        "Aún no tienes hitos. Toca \"Nuevo hito\" para agregar tu primera entrega.",
+                        if (estado.esProfesor) "Aún no hay hitos. Toca \"Nuevo hito\" para definir la primera entrega."
+                        else "Tu profesor guía aún no define hitos.",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(24.dp)
                     )
@@ -122,8 +144,10 @@ fun HitosScreen(
                 TarjetaHito(
                     hito = hito,
                     hoy = estado.hoy,
+                    esProfesor = estado.esProfesor,
+                    conversacion = estado.conversaciones[hito.id],
                     alMarcar = { viewModel.marcarEntregado(hito, it) },
-                    alEditar = { editarHito(hito.id) },
+                    alAbrir = { abrirHito(hito.id) },
                     alEliminar = { hitoAEliminar = hito },
                     modifier = Modifier.widthIn(max = 700.dp).animateItem()
                 )
@@ -158,8 +182,10 @@ fun HitosScreen(
 private fun TarjetaHito(
     hito: Hito,
     hoy: LocalDate,
+    esProfesor: Boolean,
+    conversacion: ResumenConversacion?,
     alMarcar: (Boolean) -> Unit,
-    alEditar: () -> Unit,
+    alAbrir: () -> Unit,
     alEliminar: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -174,18 +200,22 @@ private fun TarjetaHito(
     )
 
     Card(
-        onClick = alEditar,
+        onClick = alAbrir,
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = elevacion)
     ) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            // Checklist de entrega
-            Checkbox(
-                checked = hito.estado.estaTerminado,
-                onCheckedChange = alMarcar,
-                enabled = hito.estado != EstadoHito.APROBADO
-            )
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            // Checklist de entrega (solo el estudiante entrega; el profesor aprueba en el detalle)
+            if (!esProfesor) {
+                Checkbox(
+                    checked = hito.estado.estaTerminado,
+                    onCheckedChange = alMarcar,
+                    enabled = hito.estado != EstadoHito.APROBADO
+                )
+            } else {
+                Box(Modifier.padding(start = 4.dp))
+            }
+            Column(Modifier.weight(1f).padding(start = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(hito.titulo, style = MaterialTheme.typography.titleMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     ChipEstado(hito.estado)
@@ -206,10 +236,52 @@ private fun TarjetaHito(
                         else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+                if (conversacion != null && conversacion.total > 0) {
+                    InsigniaConversacion(conversacion, esProfesor)
+                }
             }
-            IconButton(onClick = alEliminar) {
-                Icon(painterResource(R.drawable.ic_eliminar), contentDescription = "Eliminar ${hito.titulo}")
+            if (esProfesor) {
+                IconButton(onClick = alEliminar) {
+                    Icon(painterResource(R.drawable.ic_eliminar), contentDescription = "Eliminar ${hito.titulo}")
+                }
             }
+        }
+    }
+}
+
+/**
+ * Cantidad de comentarios del hito. Se resalta (y "late") cuando hay algo pendiente
+ * para quien mira: una duda sin responder (profesor) o una respuesta nueva (estudiante).
+ */
+@Composable
+private fun InsigniaConversacion(conversacion: ResumenConversacion, esProfesor: Boolean) {
+    val pendiente = if (esProfesor) conversacion.esperaProfesor else conversacion.esperaEstudiante
+    val colores = MaterialTheme.colorScheme
+    val pulso = rememberInfiniteTransition(label = "pulso")
+    val escala by pulso.animateFloat(
+        1f, if (pendiente) 1.08f else 1f,
+        infiniteRepeatable(tween(700), RepeatMode.Reverse), label = "escalaPulso"
+    )
+    Surface(
+        color = if (pendiente) colores.tertiary else colores.surfaceVariant,
+        contentColor = if (pendiente) colores.onTertiary else colores.onSurfaceVariant,
+        shape = RoundedCornerShape(50),
+        modifier = Modifier.scale(escala)
+    ) {
+        Row(
+            Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Icon(painterResource(R.drawable.ic_comentario), contentDescription = null, modifier = Modifier.size(16.dp))
+            Text(
+                when {
+                    pendiente && esProfesor -> "${conversacion.total} · Por responder"
+                    pendiente -> "${conversacion.total} · Respuesta del profesor"
+                    else -> "${conversacion.total} comentario(s)"
+                },
+                style = MaterialTheme.typography.labelMedium
+            )
         }
     }
 }

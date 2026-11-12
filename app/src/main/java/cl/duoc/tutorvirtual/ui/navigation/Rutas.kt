@@ -14,9 +14,12 @@ object Rutas {
     const val FAQ = "faq"
     const val HITOS = "hitos"
     const val HITO_FORM = "hito_form?hitoId={hitoId}"
+    const val HITO_DETALLE = "hito/{hitoId}"
     const val PERFIL = "perfil"
 
     fun guiaDetalle(etapaId: Int) = "guia/$etapaId"
+
+    fun hitoDetalle(hitoId: Long) = "hito/$hitoId"
 
     /** Sin id = crear un hito nuevo; con id = editar uno existente. */
     fun hitoForm(hitoId: Long? = null) =
@@ -39,6 +42,7 @@ fun tituloDeRuta(ruta: String?): String = when (ruta) {
     Rutas.FAQ -> "Preguntas frecuentes"
     Rutas.HITOS -> "Mis hitos"
     Rutas.HITO_FORM -> "Hito"
+    Rutas.HITO_DETALLE -> "Detalle del hito"
     Rutas.PERFIL -> "Mi perfil"
     else -> "Tutor Virtual ESUCAR"
 }

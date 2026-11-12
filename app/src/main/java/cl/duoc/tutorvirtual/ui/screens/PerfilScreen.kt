@@ -25,7 +25,23 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import cl.duoc.tutorvirtual.data.model.TamanoTexto
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -59,7 +75,10 @@ import cl.duoc.tutorvirtual.viewmodel.PerfilViewModel
 
 /** Perfil del usuario (formulario validado) + ajustes de la app. */
 @Composable
-fun PerfilScreen(viewModel: PerfilViewModel = viewModel(factory = PerfilViewModel.Factory)) {
+fun PerfilScreen(
+    cerrarSesion: () -> Unit,
+    viewModel: PerfilViewModel = viewModel(factory = PerfilViewModel.Factory)
+) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
     val ajustes by viewModel.ajustes.collectAsStateWithLifecycle()
     val foto by viewModel.foto.collectAsStateWithLifecycle()
@@ -110,13 +129,25 @@ fun PerfilScreen(viewModel: PerfilViewModel = viewModel(factory = PerfilViewMode
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text("Mis datos", style = MaterialTheme.typography.titleLarge)
 
-                        Text("Soy", style = MaterialTheme.typography.titleMedium)
-                        GrupoRadio(
-                            opciones = Rol.entries,
-                            seleccionada = estado.rol,
-                            etiqueta = { it.etiqueta },
-                            alElegir = viewModel::onRolChange
-                        )
+                        // Perfil fijo: lo define la cuenta con que se inició sesión
+                        Surface(
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = RoundedCornerShape(50),
+                            modifier = Modifier.padding(vertical = 6.dp)
+                        ) {
+                            Row(
+                                Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    painterResource(if (estado.rol == Rol.PROFESOR_GUIA) R.drawable.ic_supervisor else R.drawable.ic_escuela),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Text("Perfil: ${estado.rol.etiqueta}", style = MaterialTheme.typography.labelLarge)
+                            }
+                        }
 
                         CampoValidado(
                             valor = estado.nombre, alCambiar = viewModel::onNombreChange,
@@ -182,19 +213,37 @@ fun PerfilScreen(viewModel: PerfilViewModel = viewModel(factory = PerfilViewMode
                         )
                         HorizontalDivider()
                         FilaSwitch(
-                            titulo = "Texto grande",
-                            detalle = "Aumenta el tamaño de la letra en toda la app",
-                            activo = ajustes.textoGrande,
-                            alCambiar = viewModel::cambiarTextoGrande
+                            titulo = "Modo oscuro",
+                            detalle = "Fondo oscuro, cómodo de noche",
+                            activo = ajustes.modoOscuro,
+                            alCambiar = viewModel::cambiarModoOscuro
+                        )
+                        HorizontalDivider()
+                        Text("Tamaño de la letra", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 12.dp))
+                        Text("Se aplica en toda la app", style = MaterialTheme.typography.bodyMedium)
+                        SelectorTamanoTexto(
+                            seleccionado = ajustes.tamanoTexto,
+                            alElegir = viewModel::cambiarTamanoTexto,
+                            modifier = Modifier.padding(top = 10.dp, bottom = 4.dp)
                         )
                     }
+                }
+
+                OutlinedButton(
+                    onClick = cerrarSesion,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                ) {
+                    Icon(painterResource(R.drawable.ic_salir), contentDescription = null)
+                    Text("Cerrar sesión", Modifier.padding(start = 8.dp))
                 }
             }
         }
     }
 }
 
-/** Grupo de RadioButton genérico (sirve para Rol y Asignatura). */
+/** Grupo de RadioButton genérico (sirve para la asignatura). */
 @Composable
 private fun <T> GrupoRadio(
     opciones: List<T>,
@@ -213,6 +262,43 @@ private fun <T> GrupoRadio(
             ) {
                 RadioButton(selected = opcion == seleccionada, onClick = null)
                 Text(etiqueta(opcion), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(start = 8.dp))
+            }
+        }
+    }
+}
+
+/** Tres opciones de tamaño: cada una muestra "Aa" en su tamaño real; la elegida se resalta con animación. */
+@Composable
+private fun SelectorTamanoTexto(
+    seleccionado: TamanoTexto,
+    alElegir: (TamanoTexto) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colores = MaterialTheme.colorScheme
+    Row(modifier.fillMaxWidth().selectableGroup(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        TamanoTexto.entries.forEach { opcion ->
+            val elegido = opcion == seleccionado
+            val fondo by animateColorAsState(if (elegido) colores.primaryContainer else colores.surfaceContainerLow, label = "fondoTam")
+            val borde by animateColorAsState(if (elegido) colores.primary else colores.outline.copy(alpha = 0.3f), label = "bordeTam")
+            val escala by animateFloatAsState(
+                if (elegido) 1f else 0.95f,
+                spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                label = "escalaTam"
+            )
+            Column(
+                Modifier
+                    .weight(1f)
+                    .scale(escala)
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(BorderStroke(if (elegido) 2.dp else 1.dp, borde), RoundedCornerShape(16.dp))
+                    .background(fondo)
+                    .selectable(selected = elegido, onClick = { alElegir(opcion) }, role = Role.RadioButton)
+                    .padding(vertical = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Tamaño fijo (no escalado) para que la vista previa compare bien las 3 opciones
+                Text("Aa", fontSize = (20 * opcion.escala).sp, fontWeight = FontWeight.Bold, color = colores.onSurface)
+                Text(opcion.etiqueta, style = MaterialTheme.typography.labelMedium)
             }
         }
     }

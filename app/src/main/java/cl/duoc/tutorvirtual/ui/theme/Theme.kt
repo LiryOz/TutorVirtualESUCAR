@@ -1,6 +1,6 @@
 package cl.duoc.tutorvirtual.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import cl.duoc.tutorvirtual.data.model.TamanoTexto
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -18,7 +18,7 @@ private val EsquemaClaro = lightColorScheme(
     onTertiary = VerdeOscuro,
     secondaryContainer = Color(0xFFD7EBD3),
     onSecondaryContainer = VerdeOscuro,
-    background = FondoClaro,
+    background = Color.White,          // fondo blanco en modo claro
     onBackground = TextoOscuro,
     surface = Color.White,
     onSurface = TextoOscuro,
@@ -42,6 +42,8 @@ private val EsquemaOscuro = darkColorScheme(
     onPrimaryContainer = Color.White,
     secondary = DoradoClaro,
     onSecondary = TextoOscuro,
+    tertiary = VerdeAcento,
+    onTertiary = VerdeOscuro,
     secondaryContainer = Dorado,
     onSecondaryContainer = Color.White,
     background = FondoOscuro,
@@ -63,17 +65,18 @@ private val EsquemaOscuro = darkColorScheme(
 /**
  * Tema de la app (2.2.1 MaterialTheme: colores + tipografía).
  * No usamos "dynamic color" de Android 12 porque podría bajar el contraste
- * que pide el caso. [textoGrande] viene de los ajustes guardados en DataStore.
+ * que pide el caso. [modoOscuro] y [tamanoTexto] vienen de los ajustes guardados
+ * en DataStore: por defecto la app es clara (fondo blanco) aunque el teléfono esté en modo oscuro.
  */
 @Composable
 fun TutorVirtualESUCARTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    textoGrande: Boolean = false,
+    modoOscuro: Boolean = false,
+    tamanoTexto: TamanoTexto = TamanoTexto.NORMAL,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = if (darkTheme) EsquemaOscuro else EsquemaClaro,
-        typography = tipografia(if (textoGrande) 1.2f else 1f),
+        colorScheme = if (modoOscuro) EsquemaOscuro else EsquemaClaro,
+        typography = tipografia(tamanoTexto.escala),
         content = content
     )
 }

@@ -6,8 +6,10 @@ import androidx.datastore.preferences.core.edit
 import cl.duoc.tutorvirtual.data.local.datastore.Claves
 import cl.duoc.tutorvirtual.data.model.Ajustes
 import cl.duoc.tutorvirtual.data.model.Asignatura
+import cl.duoc.tutorvirtual.data.model.Cuenta
 import cl.duoc.tutorvirtual.data.model.Perfil
 import cl.duoc.tutorvirtual.data.model.Rol
+import cl.duoc.tutorvirtual.data.model.TamanoTexto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -32,7 +34,10 @@ class PreferenciasRepository(private val dataStore: DataStore<Preferences>) {
     val ajustes: Flow<Ajustes> = dataStore.data.map { p ->
         Ajustes(
             recordatorios = p[Claves.RECORDATORIOS] ?: true,
-            textoGrande = p[Claves.TEXTO_GRANDE] ?: false
+            // Si viene de la versión anterior (sí/no), "sí" equivale a Grande
+            tamanoTexto = TamanoTexto.entries.find { it.name == p[Claves.TAMANO_TEXTO] }
+                ?: if (p[Claves.TEXTO_GRANDE] == true) TamanoTexto.GRANDE else TamanoTexto.NORMAL,
+            modoOscuro = p[Claves.MODO_OSCURO] ?: false
         )
     }.distinctUntilChanged()
 
@@ -53,11 +58,48 @@ class PreferenciasRepository(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { p -> if (ruta == null) p.remove(Claves.FOTO) else p[Claves.FOTO] = ruta }
     }
 
+    /** Usuario con sesión abierta; "" si nadie ha iniciado sesión. */
+    val sesion: Flow<String> = dataStore.data.map { it[Claves.SESION] ?: "" }.distinctUntilChanged()
+
+    /**
+     * Abre la sesión. Si entra una cuenta distinta a la anterior, el perfil se
+     * reemplaza con los datos de esa cuenta. Devuelve la foto que quedó sin dueño
+     * (para borrar el archivo) o null.
+     */
+    suspend fun iniciarSesion(cuenta: Cuenta): String? {
+        var fotoDescartada: String? = null
+        dataStore.edit { p ->
+            if (p[Claves.ULTIMA_CUENTA] != cuenta.usuario) {
+                fotoDescartada = p[Claves.FOTO]
+                p.remove(Claves.FOTO)
+                p.remove(Claves.RUT)
+                p.remove(Claves.ASIGNATURA)
+                p[Claves.NOMBRE] = cuenta.nombre
+                p[Claves.CORREO] = cuenta.correo
+                p[Claves.PROFESOR_GUIA] = cuenta.profesorGuia
+                cuenta.asignatura?.let { p[Claves.ASIGNATURA] = it.name }
+            }
+            p[Claves.ROL] = cuenta.rol.name
+            p[Claves.ULTIMA_CUENTA] = cuenta.usuario
+            p[Claves.SESION] = cuenta.usuario
+        }
+        return fotoDescartada
+    }
+
+    /** Cierra la sesión; el perfil se conserva para el próximo ingreso de la misma cuenta. */
+    suspend fun cerrarSesion() {
+        dataStore.edit { it.remove(Claves.SESION) }
+    }
+
     suspend fun cambiarRecordatorios(activo: Boolean) {
         dataStore.edit { it[Claves.RECORDATORIOS] = activo }
     }
 
-    suspend fun cambiarTextoGrande(activo: Boolean) {
-        dataStore.edit { it[Claves.TEXTO_GRANDE] = activo }
+    suspend fun cambiarTamanoTexto(tamano: TamanoTexto) {
+        dataStore.edit { it[Claves.TAMANO_TEXTO] = tamano.name }
+    }
+
+    suspend fun cambiarModoOscuro(activo: Boolean) {
+        dataStore.edit { it[Claves.MODO_OSCURO] = activo }
     }
 }

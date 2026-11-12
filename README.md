@@ -23,17 +23,28 @@ los profesores guía reciben muchas consultas repetidas.
 La app reúne en un solo lugar la **guía metodológica paso a paso**, un **buscador de preguntas frecuentes**, las
 **pautas de evaluación** y el **seguimiento de hitos** con recordatorios. Todo funciona **sin internet**.
 
+## Cuentas de prueba
+
+| Perfil | Usuario | Contraseña |
+|---|---|---|
+| Estudiante de trabajo de título | `alumno` | `alumno123` |
+| Profesor guía | `profesor` | `profesor123` |
+
+En el login se elige el perfil y el botón **Usar** rellena la cuenta de prueba. Una cuenta solo entra con su propio perfil.
+
 ## Funcionalidades
 
 | Módulo | Qué hace |
 |---|---|
-| **Inicio** | Saludo, alertas de hitos vencidos o por vencer, barra de avance, próxima entrega y accesos rápidos. |
+| **Inicio de sesión** | Login con dos perfiles (Estudiante / Profesor guía), cuentas de prueba, mostrar/ocultar contraseña, errores animados y sesión guardada en DataStore. Botón "Cerrar sesión" en la barra superior y en Perfil. |
+| **Inicio** | Encabezado animado con el perfil activo. Estudiante: alertas de plazos, barra de avance, próxima entrega y accesos rápidos. Profesor guía: indicadores (por revisar, aprobados, vencidos) y lista de entregas "Enviadas" para aprobar. |
 | **Guía metodológica** | 6 etapas (Planteamiento, Marco teórico, Metodología, Recogida de información, Análisis, Conclusiones) con paso a paso y **pauta de evaluación** desplegable. Botones Anterior/Siguiente. |
 | **Preguntas frecuentes** | Buscador que ignora mayúsculas y tildes, más filtro por categoría (Citación, Metodología, Formato, Entregas). |
-| **Mis hitos** | Lista de entregas guardadas en el teléfono (Room) con estado, fecha límite, días restantes, checklist de entrega, eliminar con confirmación y "Deshacer". |
-| **Formulario de hito** | Crear y editar hitos: título, descripción, formato requerido, fecha (calendario), estado y **foto de evidencia**. Validación por campo con íconos y mensajes. |
-| **Perfil** | Rol (estudiante / profesor guía), nombre, RUT (con dígito verificador), correo, asignatura y profesor guía. **Foto de perfil** con cámara o galería. |
-| **Ajustes** | Recordatorios de fechas límite y "texto grande" (accesibilidad), guardados con DataStore. |
+| **Mis hitos** | Lista de entregas guardadas en el teléfono (Room) con estado, fecha límite, días restantes y contador de comentarios. **Profesor guía:** crea, edita y elimina hitos (con "Deshacer"). **Estudiante:** marca sus entregas con el checklist. |
+| **Detalle del hito** | Estado con permisos por perfil (solo el profesor guía aprueba). Conversación por hito: el estudiante comenta **avances o dudas** y **adjunta archivos** (PDF, Word, imágenes; máx. 10 MB); el profesor guía **responde**. |
+| **Formulario de hito** | (Solo profesor guía) Crear y editar hitos: título, descripción, formato requerido, fecha (calendario), estado y **foto de evidencia**. Validación por campo con íconos y mensajes. |
+| **Perfil** | Perfil fijado por la cuenta (estudiante / profesor guía), nombre, RUT (con dígito verificador), correo, asignatura y profesor guía. **Foto de perfil** con cámara o galería. |
+| **Ajustes** | Recordatorios de fechas límite, **modo oscuro** (la app es clara por defecto) y **tamaño de letra** (Pequeño / Normal / Grande), guardados con DataStore. |
 | **Notificaciones** | Al abrir la app, avisa si hay hitos vencidos o que vencen en 3 días o menos. |
 
 ### Requisitos de la evaluación y dónde se cumplen
@@ -117,5 +128,5 @@ Tomar estas capturas del emulador y guardarlas en `docs/capturas/`:
 
 - El contenido de la guía, las preguntas frecuentes y las pautas es **de ejemplo**; debe reemplazarse por el material
   autorizado de ESUCAR (`GuiaRepository.kt` y `FaqRepository.kt`).
-- El perfil "profesor guía" es un rol simple, sin inicio de sesión (supuesto del MVP).
+- Las cuentas son genéricas y viven dentro de la app (`data/model/Cuenta.kt`), porque el MVP no se conecta a servidores de la institución (caso 3.4).
 - Más detalles en [`PLAN.md`](PLAN.md) (requisitos y estado) y [`DEFENSA.md`](DEFENSA.md) (explicación del código).

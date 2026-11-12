@@ -23,5 +23,9 @@ object Claves {
     val ROL = stringPreferencesKey("rol")
     val FOTO = stringPreferencesKey("foto")
     val RECORDATORIOS = booleanPreferencesKey("recordatorios")
-    val TEXTO_GRANDE = booleanPreferencesKey("texto_grande")
+    val TEXTO_GRANDE = booleanPreferencesKey("texto_grande")      // versión anterior (sí/no)
+    val TAMANO_TEXTO = stringPreferencesKey("tamano_texto")       // PEQUENO / NORMAL / GRANDE
+    val MODO_OSCURO = booleanPreferencesKey("modo_oscuro")
+    val SESION = stringPreferencesKey("sesion_usuario")          // cuenta con sesión abierta
+    val ULTIMA_CUENTA = stringPreferencesKey("ultima_cuenta")   // de quién son los datos del perfil
 }

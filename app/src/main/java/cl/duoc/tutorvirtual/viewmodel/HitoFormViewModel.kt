@@ -132,6 +132,11 @@ class HitoFormViewModel(
     fun guardar() {
         if (_estado.value.guardando) return
         viewModelScope.launch {
+            // Solo el profesor guía define la estructura: crea y edita hitos
+            if (!esProfesor.first()) {
+                _estado.update { it.copy(mensaje = "Solo el profesor guía puede crear o editar hitos") }
+                return@launch
+            }
             val s = _estado.value
             val errores = HitoValidator.validarTodo(
                 titulo = s.titulo,

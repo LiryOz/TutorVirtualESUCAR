@@ -19,7 +19,8 @@ class TutorApp : Application() {
 /** Crea los repositorios una sola vez (inyección de dependencias manual y simple). */
 class ContenedorApp(context: Context) {
     val hitoRepository: HitoRepository by lazy {
-        HitoRepository(AppDatabase.obtener(context).hitoDao())
+        val db = AppDatabase.obtener(context)
+        HitoRepository(db.hitoDao(), db.comentarioDao())
     }
     val preferencias: PreferenciasRepository by lazy {
         PreferenciasRepository(context.dataStore)
