@@ -166,10 +166,10 @@ fun InicioScreen(
                     if (esProfesor) {
                         AccesoRapido("Revisar y aprobar hitos", "Cambia el estado a \"Aprobado\"", R.drawable.ic_hito) { irA(Rutas.HITOS) }
                         AccesoRapido("Pautas y rúbricas", "Criterios de evaluación por etapa", R.drawable.ic_guia) { irA(Rutas.GUIA) }
-                        AccesoRapido("Banco de preguntas", "Citación, metodología y formato", R.drawable.ic_ayuda) { irA(Rutas.FAQ) }
+                        AccesoRapido("Preguntarle al Sargento", "Citación, metodología y formato", R.drawable.ic_ayuda) { irA(Rutas.FAQ) }
                     } else {
                         AccesoRapido("Guía metodológica", "Paso a paso de tu tesis", R.drawable.ic_guia) { irA(Rutas.GUIA) }
-                        AccesoRapido("Buscar una duda", "Preguntas frecuentes", R.drawable.ic_buscar) { irA(Rutas.FAQ) }
+                        AccesoRapido("Preguntarle al Sargento", "Tu perro guía resuelve tus dudas", R.drawable.ic_ayuda) { irA(Rutas.FAQ) }
                         AccesoRapido("Mis hitos", "Entregas y fechas límite", R.drawable.ic_hito) { irA(Rutas.HITOS) }
                     }
                 }

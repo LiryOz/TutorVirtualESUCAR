@@ -20,6 +20,7 @@ import cl.duoc.tutorvirtual.ui.screens.HitoFormScreen
 import cl.duoc.tutorvirtual.ui.screens.HitosScreen
 import cl.duoc.tutorvirtual.ui.screens.InicioScreen
 import cl.duoc.tutorvirtual.ui.screens.PerfilScreen
+import cl.duoc.tutorvirtual.ui.screens.SargentoScreen
 
 /**
  * NavHost = el "escenario" donde se muestra la pantalla actual (2.2.3).
@@ -64,7 +65,11 @@ fun AppNavHost(
                 }
             )
         }
-        composable(Rutas.FAQ) { FaqScreen() }
+        // Pestaña "Sargento": chat con preguntas y respuestas del banco de dudas
+        composable(Rutas.FAQ) {
+            SargentoScreen(verBancoPreguntas = { navController.navigate(Rutas.FAQ_LISTA) })
+        }
+        composable(Rutas.FAQ_LISTA) { FaqScreen() }
         composable(Rutas.HITOS) {
             HitosScreen(
                 nuevoHito = { navController.navigate(Rutas.hitoForm()) },
