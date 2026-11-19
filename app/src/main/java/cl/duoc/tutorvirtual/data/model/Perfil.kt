@@ -23,11 +23,21 @@ data class Perfil(
     val rol: Rol = Rol.ESTUDIANTE,
     val foto: String? = null          // ruta de la foto de perfil (Etapa 8)
 ) {
-    val estaCompleto: Boolean get() = nombre.isNotBlank() && asignatura != null
+    /** El profesor guía no necesita asignatura; el estudiante sí. */
+    val estaCompleto: Boolean
+        get() = nombre.isNotBlank() && (rol == Rol.PROFESOR_GUIA || asignatura != null)
 }
 
 /** Ajustes de la app (se guardan en DataStore). */
 data class Ajustes(
     val recordatorios: Boolean = true,   // notificaciones de fechas límite
-    val textoGrande: Boolean = false     // accesibilidad
+    val tamanoTexto: TamanoTexto = TamanoTexto.NORMAL,   // accesibilidad
+    val modoOscuro: Boolean = false      // por defecto la app es clara (fondo blanco)
 )
+
+/** Tres tamaños de letra para toda la app (accesibilidad, caso 3.3). */
+enum class TamanoTexto(val etiqueta: String, val escala: Float) {
+    PEQUENO("Pequeño", 0.88f),
+    NORMAL("Normal", 1f),
+    GRANDE("Grande", 1.2f)
+}

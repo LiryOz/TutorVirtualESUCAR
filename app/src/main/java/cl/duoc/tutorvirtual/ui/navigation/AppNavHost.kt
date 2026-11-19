@@ -15,17 +15,23 @@ import androidx.navigation.navArgument
 import cl.duoc.tutorvirtual.ui.screens.FaqScreen
 import cl.duoc.tutorvirtual.ui.screens.GuiaDetalleScreen
 import cl.duoc.tutorvirtual.ui.screens.GuiaScreen
+import cl.duoc.tutorvirtual.ui.screens.HitoDetalleScreen
 import cl.duoc.tutorvirtual.ui.screens.HitoFormScreen
 import cl.duoc.tutorvirtual.ui.screens.HitosScreen
 import cl.duoc.tutorvirtual.ui.screens.InicioScreen
 import cl.duoc.tutorvirtual.ui.screens.PerfilScreen
+import cl.duoc.tutorvirtual.ui.screens.SargentoScreen
 
 /**
  * NavHost = el "escenario" donde se muestra la pantalla actual (2.2.3).
  * Cada composable(ruta) registra una pantalla.
  */
 @Composable
-fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
+fun AppNavHost(
+    navController: NavHostController,
+    pedirCierreSesion: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     NavHost(
         navController = navController,
         startDestination = Rutas.INICIO,
@@ -39,7 +45,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         composable(Rutas.INICIO) {
             InicioScreen(
                 irA = { ruta -> navController.navegarPrincipal(ruta) },
-                abrirHito = { id -> navController.navigate(Rutas.hitoForm(id)) }
+                abrirHito = { id -> navController.navigate(Rutas.hitoDetalle(id)) }
             )
         }
         composable(Rutas.GUIA) {
@@ -59,11 +65,26 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                 }
             )
         }
-        composable(Rutas.FAQ) { FaqScreen() }
+        // Pestaña "Sargento": chat con preguntas y respuestas del banco de dudas
+        composable(Rutas.FAQ) {
+            SargentoScreen(verBancoPreguntas = { navController.navigate(Rutas.FAQ_LISTA) })
+        }
+        composable(Rutas.FAQ_LISTA) { FaqScreen() }
         composable(Rutas.HITOS) {
             HitosScreen(
                 nuevoHito = { navController.navigate(Rutas.hitoForm()) },
-                editarHito = { id -> navController.navigate(Rutas.hitoForm(id)) }
+                abrirHito = { id -> navController.navigate(Rutas.hitoDetalle(id)) }
+            )
+        }
+        // Detalle: estado, conversación y archivos (ambos perfiles)
+        composable(
+            Rutas.HITO_DETALLE,
+            arguments = listOf(navArgument("hitoId") { type = NavType.LongType })
+        ) { entrada ->
+            HitoDetalleScreen(
+                hitoId = entrada.arguments?.getLong("hitoId") ?: -1L,
+                editar = { id -> navController.navigate(Rutas.hitoForm(id)) },
+                alVolver = { navController.popBackStack() }
             )
         }
         composable(
@@ -79,7 +100,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                 alTerminar = { navController.popBackStack() }
             )
         }
-        composable(Rutas.PERFIL) { PerfilScreen() }
+        composable(Rutas.PERFIL) { PerfilScreen(cerrarSesion = pedirCierreSesion) }
     }
 }
 

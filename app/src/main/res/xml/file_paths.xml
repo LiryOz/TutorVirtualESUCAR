@@ -2,4 +2,6 @@
 <!-- Carpetas que FileProvider puede compartir temporalmente con la app de cámara -->
 <paths>
     <files-path name="fotos" path="fotos/" />
+    <!-- Archivos adjuntos a los comentarios (se abren con la app que corresponda: PDF, Word...) -->
+    <files-path name="adjuntos" path="adjuntos/" />
 </paths>

@@ -10,6 +10,7 @@ import cl.duoc.tutorvirtual.data.model.Ajustes
 import cl.duoc.tutorvirtual.data.model.Asignatura
 import cl.duoc.tutorvirtual.data.model.Perfil
 import cl.duoc.tutorvirtual.data.model.Rol
+import cl.duoc.tutorvirtual.data.model.TamanoTexto
 import cl.duoc.tutorvirtual.data.repository.PreferenciasRepository
 import cl.duoc.tutorvirtual.nativo.GestorFotos
 import cl.duoc.tutorvirtual.validation.PerfilErrores
@@ -85,16 +86,7 @@ class PerfilViewModel(private val preferencias: PreferenciasRepository) : ViewMo
         it.copy(profesorGuia = v, errores = it.errores.copy(profesorGuia = PerfilValidator.validarProfesorGuia(v, it.rol)))
     }
 
-    /** Cambiar el rol afecta qué campos son obligatorios: se re-validan. */
-    fun onRolChange(v: Rol) = _estado.update {
-        it.copy(
-            rol = v,
-            errores = it.errores.copy(
-                asignatura = if (it.errores.asignatura != null) PerfilValidator.validarAsignatura(it.asignatura, v) else null,
-                profesorGuia = if (it.errores.profesorGuia != null) PerfilValidator.validarProfesorGuia(it.profesorGuia, v) else null
-            )
-        )
-    }
+    // El rol ya no se elige aquí: lo define la cuenta con que se inició sesión.
 
     fun guardar() {
         val s = _estado.value
@@ -121,8 +113,12 @@ class PerfilViewModel(private val preferencias: PreferenciasRepository) : ViewMo
         viewModelScope.launch { preferencias.cambiarRecordatorios(activo) }
     }
 
-    fun cambiarTextoGrande(activo: Boolean) {
-        viewModelScope.launch { preferencias.cambiarTextoGrande(activo) }
+    fun cambiarTamanoTexto(tamano: TamanoTexto) {
+        viewModelScope.launch { preferencias.cambiarTamanoTexto(tamano) }
+    }
+
+    fun cambiarModoOscuro(activo: Boolean) {
+        viewModelScope.launch { preferencias.cambiarModoOscuro(activo) }
     }
 
     /** Guarda la nueva foto de perfil y borra el archivo de la anterior. */

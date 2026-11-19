@@ -21,6 +21,10 @@ interface HitoDao {
     @Query("SELECT * FROM hitos WHERE id = :id")
     suspend fun obtenerPorId(id: Long): HitoEntity?
 
+    // Un solo hito, que se actualiza solo cuando cambia (pantalla de detalle)
+    @Query("SELECT * FROM hitos WHERE id = :id")
+    fun observarPorId(id: Long): Flow<HitoEntity?>
+
     // CREATE
     @Insert
     suspend fun insertar(hito: HitoEntity): Long

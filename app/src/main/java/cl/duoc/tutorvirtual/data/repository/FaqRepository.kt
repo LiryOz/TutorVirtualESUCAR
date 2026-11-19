@@ -32,6 +32,27 @@ object FaqRepository {
         Normalizer.normalize(texto.lowercase(), Normalizer.Form.NFD)
             .replace(Regex("\\p{M}"), "")
 
+    /**
+     * Palabras clave por pregunta (id → palabras). Le permiten al bot Sargento
+     * reconocer la duda aunque se escriba distinto: "referencia de un libro" ≈ pregunta 1.
+     */
+    private val palabrasClave = mapOf(
+        1 to listOf("libro", "libros", "apa", "cito", "citar", "cita", "referencia", "referencias", "bibliografia", "autor"),
+        2 to listOf("web", "pagina", "internet", "url", "sitio", "link", "enlace", "online"),
+        3 to listOf("textual", "parafrasis", "parafrasear", "comillas", "copiar", "plagio"),
+        4 to listOf("ley", "leyes", "normativa", "norma", "reglamento", "decreto", "institucional"),
+        5 to listOf("investigacion", "problema", "tema", "formular", "planteamiento"),
+        6 to listOf("enfoque", "cuantitativo", "cualitativo", "mixto", "encuesta", "entrevista", "metodo"),
+        7 to listOf("muestra", "personas", "participantes", "encuestados", "poblacion", "cantidad"),
+        8 to listOf("objetivo", "objetivos", "especificos", "general", "verbo", "infinitivo"),
+        9 to listOf("estructura", "informe", "final", "partes", "capitulos", "indice", "portada"),
+        10 to listOf("letra", "fuente", "espaciado", "interlineado", "margen", "margenes", "tamano", "times", "arial"),
+        11 to listOf("tabla", "tablas", "figura", "figuras", "grafico", "graficos", "imagen", "imagenes"),
+        12 to listOf("atraso", "atrasado", "plazo", "fecha", "tarde", "prorroga", "llego", "vencido"),
+        13 to listOf("enviar", "envio", "avance", "avances", "word", "pdf", "archivo", "subir"),
+        14 to listOf("estado", "estados", "iniciar", "desarrollo", "enviado", "aprobado", "significa")
+    )
+
     private val preguntas = listOf(
         PreguntaFrecuente(1, "¿Cómo cito un libro en norma APA?", CategoriaFaq.CITACION,
             "Apellido, Inicial. (Año). Título del libro en cursiva. Editorial. En el texto usa (Apellido, año)."),
@@ -61,5 +82,5 @@ object FaqRepository {
             "Revisa el \"formato requerido\" de cada hito en la sección Hitos. Generalmente se pide documento Word o PDF."),
         PreguntaFrecuente(14, "¿Qué significa cada estado de un hito?", CategoriaFaq.ENTREGAS,
             "Por iniciar: aún no empiezas. En desarrollo: estás trabajando. Enviado: ya lo entregaste. Aprobado: el profesor guía lo aprobó.")
-    )
+    ).map { it.copy(palabrasClave = palabrasClave[it.id].orEmpty()) }
 }

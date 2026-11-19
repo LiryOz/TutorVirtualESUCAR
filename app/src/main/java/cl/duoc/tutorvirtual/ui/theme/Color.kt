@@ -15,7 +15,6 @@ val VerdeClaro = Color(0xFFC8E6C9)
 val VerdeOscuro = Color(0xFF0A2E0C)
 val Dorado = Color(0xFF7A5900)
 val DoradoClaro = Color(0xFFFFE08A)
-val FondoClaro = Color(0xFFFAFAF7)
 val TextoOscuro = Color(0xFF505050)          // color de todas las letras "negras"
 val GrisBorde = Color(0xFF5A5A5A)
 val RojoError = Color(0xFFB3261E)

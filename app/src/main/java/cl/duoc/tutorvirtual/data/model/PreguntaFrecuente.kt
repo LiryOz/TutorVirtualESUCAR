@@ -8,10 +8,14 @@ enum class CategoriaFaq(val etiqueta: String) {
     ENTREGAS("Entregas")
 }
 
-/** Una pregunta frecuente con su respuesta instructiva. */
+/**
+ * Una pregunta frecuente con su respuesta instructiva.
+ * [palabrasClave]: otras formas en que alguien podría preguntarlo (las usa el bot Sargento).
+ */
 data class PreguntaFrecuente(
     val id: Int,
     val pregunta: String,
     val categoria: CategoriaFaq,
-    val respuesta: String
+    val respuesta: String,
+    val palabrasClave: List<String> = emptyList()
 )
