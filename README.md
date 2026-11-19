@@ -3,14 +3,14 @@
 Aplicación Android (Kotlin + Jetpack Compose) que funciona como **tutor virtual para la asignatura Trabajo de
 Título I, II y III** de la Escuela de Suboficiales de Carabineros (ESUCAR).
 
-Proyecto de la **Evaluación Parcial 2** de DSY1105 – Desarrollo de Aplicaciones Móviles (Duoc UC).
+Proyecto de la **Evaluación Parcial 3** de DSY1105 – Desarrollo de Aplicaciones Móviles (Duoc UC).
 
 ## Equipo
 
 | Integrante | GitHub |
 |---|---|
-| _Nombre Apellido_ | _usuario_ |
-| _Nombre Apellido_ | _usuario_ |
+| Deborah Palma | Wenchispop |
+| Paola Pozo | LiryOz |
 
 > Completar con los nombres reales antes de la entrega.
 
