@@ -13,3 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Material de la evaluación (PDF y presentaciones): no se sube al repositorio
+/Prueba2/*.pdf
+/Prueba2/*.pptx
+# Archivos personales del IDE
+/.idea/deploymentTargetSelector.xml
+/.idea/TutorVirtualESUCAR.iml
