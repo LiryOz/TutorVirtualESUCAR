@@ -12,8 +12,6 @@ Proyecto de la **Evaluación Parcial 3** de DSY1105 – Desarrollo de Aplicacion
 | Deborah Palma | Wenchispop |
 | Paola Pozo | LiryOz |
 
-> Completar con los nombres reales antes de la entrega.
-
 ## ¿Qué problema resuelve?
 
 Los estudiantes de Trabajo de Título avanzan de forma autónoma con material estático y no tienen una herramienta en el
